@@ -1,0 +1,24 @@
+{
+  "name": "slack-emoji-downloader",
+  "version": "1.0.0",
+  "description": "downloads all slack emojis given a token",
+  "main": "index.js",
+  "dependencies": {
+    "async": "2.6.1",
+    "dotenv": "6.1.0",
+    "request": "2.88.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hjdarnel/slack-emoji-downloader.git"
+  },
+  "author": "Henry Darnell",
+  "bugs": {
+    "url": "https://github.com/hjdarnel/slack-emoji-downloader/issues"
+  },
+  "homepage": "https://github.com/hjdarnel/slack-emoji-downloader#readme"
+}
