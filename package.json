@@ -10,7 +10,8 @@
   },
   "devDependencies": {},
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "clean": "find ./static ! -name '.gitkeep' -type f -exec rm -f {} +"
   },
   "repository": {
     "type": "git",

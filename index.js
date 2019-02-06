@@ -12,6 +12,7 @@ const downloadEmoji = (item, key, callback) => {
     if (item.startsWith('alias:')) {
         callback();
     } else {
+        console.log(`Downloading ${key}`)
         const r = request(item);
         r.on('response', (res) => {
             res.pipe(fs.createWriteStream(directory + key + '.' + res.headers['content-type'].split('/')[1]));
