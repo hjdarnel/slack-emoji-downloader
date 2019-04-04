@@ -23,10 +23,16 @@ jobs:
       - run:
           name: Remove gitkeep
           command: rm ./static/.gitkeep
+      - run:
+          name: Zip artifacts
+          command: tar -zcvf emojis.tar.gz static/
+      - store_artifacts:
+          path: emojis.tar.gz
       - persist_to_workspace:
           root: .
           paths:
             - static
+            - emojis.tar.gz
   upload:
     working_directory: ~/emojis
     docker:
@@ -37,21 +43,19 @@ jobs:
       - run:
           name: Set subdirectory datetime
           command: |
-            echo 'export DATE="$(date "+%Y %m %d %H:%M:%S")"' >> $BASH_ENV
+            echo 'export DATE="$(TZ=US/Central date "+%Y %m %d %H:%M:%S")"' >> $BASH_ENV
             source $BASH_ENV
       - aws-s3/copy:
           from: ./static
           to: '"s3://${S3_BUCKET}/${DATE}"'
           arguments: --recursive --acl public-read
+      - aws-s3/copy:
+          from: ./emojis.tar.gz
+          to: '"s3://${S3_BUCKET}"'
+          arguments: --acl public-read
 workflows:
   version: 2
-  test:
-    jobs:
-      - pull
-      - upload:
-          requires:
-            - pull
-  pull_and_upload:
+  weekly:
     triggers:
       - schedule:
           cron: "0 23 * * 5"
