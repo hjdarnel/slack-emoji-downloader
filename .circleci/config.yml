@@ -55,6 +55,12 @@ jobs:
           arguments: --acl public-read
 workflows:
   version: 2
+  tester:
+    jobs:
+      - pull
+      - upload:
+          requires:
+            - pull
   weekly:
     triggers:
       - schedule:
