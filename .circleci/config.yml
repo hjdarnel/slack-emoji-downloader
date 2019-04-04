@@ -1,0 +1,66 @@
+version: 2.1
+orbs:
+  aws-s3: circleci/aws-s3@1.0.4
+jobs:
+  pull:
+    working_directory: ~/emojis
+    docker:
+      - image: circleci/node:11
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run:
+          name: Install Deps
+          command: npm install
+      - save_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - ./node_modules
+      - run:
+          name: Run script
+          command: npm run start
+      - run:
+          name: Remove gitkeep
+          command: rm ./static/.gitkeep
+      - persist_to_workspace:
+          root: .
+          paths:
+            - static
+  upload:
+    working_directory: ~/emojis
+    docker:
+      - image: 'circleci/python:2.7'
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Set subdirectory datetime
+          command: |
+            echo 'export DATE="$(date "+%Y %m %d %H:%M:%S")"' >> $BASH_ENV
+            source $BASH_ENV
+      - aws-s3/copy:
+          from: ./static
+          to: '"s3://${S3_BUCKET}/${DATE}"'
+          arguments: --recursive --acl public-read
+workflows:
+  version: 2
+  test:
+    jobs:
+      - pull
+      - upload:
+          requires:
+            - pull
+  pull_and_upload:
+    triggers:
+      - schedule:
+          cron: "0 23 * * 5"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - pull
+      - upload:
+          requires:
+            - pull
