@@ -61,16 +61,3 @@ workflows:
       - upload:
           requires:
             - pull
-  weekly:
-    triggers:
-      - schedule:
-          cron: "0 23 * * 5"
-          filters:
-            branches:
-              only:
-                - master
-    jobs:
-      - pull
-      - upload:
-          requires:
-            - pull
